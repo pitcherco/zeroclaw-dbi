@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git config user.email)",
+      "Bash(gh auth status)",
+      "Bash(where gh)",
+      "Bash(where az)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh\" auth status)",
+      "Bash(\"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin/az\" account show --query \"{name:name, user:user.name, id:id}\" -o table)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh\" api user/orgs --jq '.[].login')",
+      "Bash(\"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin/az\" account show --query \"id\" -o tsv)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh\" repo fork openagen/zeroclaw --org pitcherco --fork-name zeroclaw-dbi --clone=false)",
+      "Bash(\"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin/az\" group create --name rg-zeroclaw-sbx-eastus --location eastus --tags Environment=Sandbox Workload=\"ZeroClaw Teammate Agent\" Owner=\"IT Operations\" CostCenter=IT-001 CreatedBy=claude-code CreatedDate=2026-02-24)",
+      "Bash(az cognitiveservices account create --name oai-zeroclaw-sbx-eastus --resource-group rg-zeroclaw-sbx-eastus --location eastus --kind OpenAI --sku S0 --custom-domain oai-zeroclaw-sbx-eastus --tags Environment=Sandbox Workload=\"ZeroClaw Teammate Agent\" Owner=\"IT Operations\" CostCenter=IT-001 CreatedBy=claude-code CreatedDate=2026-02-24 AgentId=agent-zeroclaw-001 AgentName=\"ZeroClaw Teammate\" Model=gpt-4o)",
+      "Read(//c/Users/renat/.local/bin/**)",
+      "Bash(\"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin/az\" role assignment create --assignee-object-id 4f0c87aa-969a-454f-a22e-b1d5eebc38b3 --assignee-principal-type ServicePrincipal --role \"Key Vault Secrets User\" --scope \"/subscriptions/fbcc25e6-6d59-43ba-b7a2-7c606880a202/resourceGroups/rg-zeroclaw-sbx-eastus/providers/Microsoft.KeyVault/vaults/kv-zeroclaw-sbx-eastus\")",
+      "Bash(az --version)",
+      "Bash(az keyvault secret set --vault-name kv-zeroclaw-sbx-eastus --name azure-openai-key --value \"19c9f240365242c88e54f252e191dcbe\" -o json --query \"id\")",
+      "Bash(az keyvault secret set --vault-name kv-zeroclaw-sbx-eastus --name azure-openai-endpoint --value \"https://oai-zeroclaw-sbx-eastus.openai.azure.com/\" -o json --query \"id\")",
+      "Bash(az keyvault secret set --vault-name kv-zeroclaw-sbx-eastus --name imap-password --value \"Dirtybirdusa1998##\" -o json --query \"id\")",
+      "Bash(az keyvault secret set --vault-name kv-zeroclaw-sbx-eastus --name m365-app-id --value \"836086a7-0308-4c57-a817-5699613f6d8c\" -o json --query \"id\")",
+      "Bash(az bot create --resource-group rg-zeroclaw-sbx-eastus --name bot-zeroclaw-sbx-eastus --kind registration --appid c28eaa4a-e081-4de8-b9d8-81fbfc28feb2 --endpoint \"https://vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com/api/messages\" --sku F0 --tags Environment=Sandbox Workload=\"ZeroClaw Teammate Agent\" Owner=\"IT Operations\" CostCenter=IT-001 AgentId=agent-zeroclaw-001 AgentName=\"ZeroClaw Teammate\" Model=gpt-4o)",
+      "Bash(az bot create --resource-group rg-zeroclaw-sbx-eastus --name bot-zeroclaw-sbx-eastus --kind registration --app-type SingleTenant --appid c28eaa4a-e081-4de8-b9d8-81fbfc28feb2 --endpoint \"https://vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com/api/messages\" --sku F0 --tenant-id 36e770ef-e6fd-4f9d-9ace-a949f98a0caa)",
+      "Bash(az bot create --resource-group rg-zeroclaw-sbx-eastus --name bot-zeroclaw-sbx-eastus --app-type SingleTenant --appid c28eaa4a-e081-4de8-b9d8-81fbfc28feb2 --endpoint \"https://vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com/api/messages\" --sku F0 --tenant-id 36e770ef-e6fd-4f9d-9ace-a949f98a0caa)",
+      "Bash(az bot msteams create --resource-group rg-zeroclaw-sbx-eastus --name bot-zeroclaw-sbx-eastus)",
+      "Bash(gh project list --owner Pitcherco)",
+      "Bash(gh auth refresh -s read:project,project)",
+      "Bash(gh repo view Pitcherco/dbi-zero-claw)",
+      "Bash(gh repo list Pitcherco --limit 20)"
+    ]
+  }
+}

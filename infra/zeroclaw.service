@@ -1,0 +1,23 @@
+[Unit]
+Description=ZeroClaw Agent Runtime
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zeroclaw
+Group=zeroclaw
+WorkingDirectory=/opt/zeroclaw
+ExecStartPre=/bin/bash /etc/zeroclaw/load-secrets.sh
+ExecStart=/opt/zeroclaw/target/release/zeroclaw daemon
+Restart=always
+RestartSec=10
+Environment=ZEROCLAW_WORKSPACE=/home/zeroclaw/.zeroclaw
+# Security hardening
+NoNewPrivileges=yes
+ProtectHome=read-only
+ProtectSystem=strict
+ReadWritePaths=/home/zeroclaw /tmp
+
+[Install]
+WantedBy=multi-user.target

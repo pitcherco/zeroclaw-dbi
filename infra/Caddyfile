@@ -1,0 +1,10 @@
+# Caddy reverse proxy for Teams adapter
+# Auto-TLS via Let's Encrypt using Azure-provided DNS
+vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com {
+    reverse_proxy /api/messages localhost:3978
+    reverse_proxy /health localhost:3978
+
+    log {
+        output file /var/log/caddy/access.log
+    }
+}

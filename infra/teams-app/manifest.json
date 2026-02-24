@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "0.1.0",
+  "id": "c28eaa4a-e081-4de8-b9d8-81fbfc28feb2",
+  "developer": {
+    "name": "Dirty Bird Industries",
+    "websiteUrl": "https://dirtybirdusa.com",
+    "privacyUrl": "https://dirtybirdusa.com/privacy",
+    "termsOfUseUrl": "https://dirtybirdusa.com/terms"
+  },
+  "name": {
+    "short": "ZeroClaw Agent",
+    "full": "ZeroClaw Teammate Agent (POC)"
+  },
+  "description": {
+    "short": "AI teammate for M365 operations",
+    "full": "DBI's AI-powered teammate that can read/write SharePoint, produce reports, check calendars, and answer questions via Teams. Powered by ZeroClaw + Azure OpenAI."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#FF6600",
+  "bots": [
+    {
+      "botId": "c28eaa4a-e081-4de8-b9d8-81fbfc28feb2",
+      "scopes": ["personal", "team", "groupChat"],
+      "supportsFiles": false,
+      "isNotificationOnly": false,
+      "commandLists": [
+        {
+          "scopes": ["personal", "team"],
+          "commands": [
+            {
+              "title": "help",
+              "description": "Show what the agent can do"
+            },
+            {
+              "title": "status",
+              "description": "Check agent status and connectivity"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": [
+    "vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com"
+  ]
+}

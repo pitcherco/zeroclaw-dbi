@@ -1,0 +1,21 @@
+[Unit]
+Description=ZeroClaw Teams Adapter
+After=zeroclaw.service
+Wants=zeroclaw.service
+
+[Service]
+Type=simple
+User=zeroclaw
+Group=zeroclaw
+WorkingDirectory=/opt/teams-adapter
+EnvironmentFile=/etc/zeroclaw/teams-adapter.env
+ExecStart=/opt/teams-adapter/.venv/bin/python -m teams_adapter.app
+Restart=always
+RestartSec=5
+# Security hardening
+NoNewPrivileges=yes
+ProtectHome=read-only
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

@@ -533,3 +533,41 @@ When working in fast iterative mode:
 - Prefer deterministic behavior over clever shortcuts.
 - Do not “ship and hope” on security-sensitive paths.
 - If uncertain, leave a concrete TODO with verification context, not a hidden guess.
+
+---
+
+## DBI Customizations (Dirty Bird Industries)
+
+### Identity (CRITICAL)
+- Git: GitHub company account `rdominguesds`, email `rdomingues@pitcherco.com`
+- Azure: subscription PPU (fbcc25e6-6d59-43ba-b7a2-7c606880a202)
+- GitHub CLI: `gh auth switch --user rdominguesds` if wrong account
+
+### DBI Tech Stack (additions)
+- Python: Teams adapter (Bot Framework SDK + aiohttp)
+- Infrastructure: Azure VM + systemd + Caddy
+- Database: PostgreSQL on Azure (JSONB, ON CONFLICT, LATERAL, RETURNING)
+
+### DBI File Locations
+- Teams adapter: `python/teams_adapter/`
+- Infrastructure scripts: `infra/`
+- DBI docs: `docs/dbi/`
+- DBI Python config: `dbi/pyproject.toml`, `dbi/requirements.txt`
+
+### DBI Development Commands
+```bash
+# Python (Teams adapter)
+cd python && python -m venv .venv && source .venv/bin/activate
+pip install -r ../dbi/requirements.txt
+pytest tests/test_dbi_init.py
+
+# Deploy to VM
+ssh zeroclaw@vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com
+sudo bash infra/vm-setup.sh
+bash infra/deploy.sh
+```
+
+### DBI Environment
+- OS: Windows, Shell: PowerShell (local dev)
+- Use PowerShell syntax for local terminal commands
+- Use `$env:VAR` not `export`, `; ` not `&&`, backslash paths, `$null` not `/dev/null`

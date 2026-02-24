@@ -1,0 +1,50 @@
+# ZeroClaw Configuration — DBI Teammate Agent POC
+# Secrets are injected by load-secrets.sh at service startup
+
+# --- LLM Provider: Azure OpenAI ---
+default_provider = "custom:https://oai-zeroclaw-sbx-eastus.openai.azure.com"
+default_model = "gpt-4o"
+api_key = "<AZURE_OPENAI_KEY>"
+default_temperature = 0.3
+
+# --- Gateway ---
+[gateway]
+bind = "127.0.0.1:42617"
+allow_public_bind = false
+
+# --- Autonomy ---
+[autonomy]
+level = "supervised"
+action_budget = 30
+
+# --- Email Channel ---
+[channels_config.email]
+imap_host = "outlook.office365.com"
+imap_port = 993
+smtp_host = "smtp.office365.com"
+smtp_port = 587
+username = "Zero@dirtybirdusa.com"
+password = "<IMAP_PASSWORD>"
+from_address = "Zero@dirtybirdusa.com"
+allowed_from = ["*"]
+idle_timeout = 1740
+
+# --- Agent Persona ---
+[agent]
+system_prompt = """You are ZeroClaw, a helpful teammate agent for Dirty Bird Industries.
+You have access to Microsoft 365 via the m365 CLI and can read/write files in SharePoint
+and OneDrive, check calendars, and produce reports.
+
+When asked to create reports or write files, save them to the Outputs folder:
+  m365 spo file add --webUrl https://dirtybirdusa.sharepoint.com/sites/<TargetSite> \
+    --folder 'Shared Documents/ZeroClaw-Outputs' --path <local-file>
+
+When asked to read files from SharePoint:
+  m365 spo file get --webUrl https://dirtybirdusa.sharepoint.com/sites/<TargetSite> \
+    --url '/Shared Documents/<filename>' --asFile --path /tmp/<filename>
+
+To list SharePoint sites: m365 spo site list
+To list files: m365 spo file list --webUrl <url> --folder <folder>
+To check calendar: m365 outlook event list
+
+Always be concise and professional."""
