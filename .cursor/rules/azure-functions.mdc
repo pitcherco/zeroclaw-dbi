@@ -1,0 +1,36 @@
+---
+description: Azure Functions v4 Python programming model patterns
+globs:
+  - "**/function_app.py"
+  - "**/host.json"
+  - "**/local.settings.json"
+alwaysApply: false
+---
+
+# Azure Functions (Python v4)
+
+## Programming Model
+Use the v4 decorator-based programming model:
+
+```python
+import azure.functions as func
+import logging
+
+app = func.FunctionApp()
+
+@app.function_name(name="MyFunction")
+@app.route(route="api/endpoint", methods=["POST"])
+def my_function(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Processing request")
+    # Implementation
+    return func.HttpResponse("OK", status_code=200)
+```
+
+## Configuration
+- local.settings.json for local development (gitignored)
+- Azure App Settings for production
+- Use managed identity for Azure service connections when possible
+
+## Deployment
+- Deploy via GitHub Actions or Azure CLI
+- Runtime: Python ~4

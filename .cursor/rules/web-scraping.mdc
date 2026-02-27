@@ -1,0 +1,28 @@
+---
+description: Web scraping patterns with Crawl4AI, Playwright, Selenium
+globs: "**/*scrap*/**"
+alwaysApply: false
+---
+
+# Web Scraping
+
+## Crawl4AI (preferred for new projects)
+- Async-first web scraping
+- Built-in LLM extraction
+- Use with Playwright backend
+
+## Playwright
+- Use for dynamic JavaScript-heavy pages
+- Headless mode for production
+- Handle anti-bot detection
+
+## Selenium
+- Legacy scraper support
+- Use WebDriverWait for dynamic content
+- Chrome/Chromium in headless mode
+
+## Best Practices
+- Respect robots.txt
+- Implement rate limiting and delays
+- Handle retries with exponential backoff
+- Store raw HTML for debugging

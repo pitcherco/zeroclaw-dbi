@@ -1,0 +1,18 @@
+---
+description: n8n workflow automation patterns
+globs: "**/n8n*/**"
+alwaysApply: false
+---
+
+# n8n Workflow Automation
+
+## Deployment
+- Docker Compose for deployment
+- Custom Docker image with additional packages
+- PostgreSQL for n8n data storage
+
+## Workflow Patterns
+- Webhook triggers for external integrations
+- Cron-based scheduled workflows
+- Error handling with retry logic
+- Custom nodes when needed

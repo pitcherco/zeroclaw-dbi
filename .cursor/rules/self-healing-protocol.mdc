@@ -1,0 +1,16 @@
+---
+description: Self-Healing Protocol — use learned patterns registry on errors
+alwaysApply: true
+---
+
+# Self-Healing Protocol
+
+When a **terminal command or runtime error** occurs in this workspace:
+
+1. **Fix the immediate issue** so the user can continue.
+2. **Check the central registry**: `D:\repos\_rules\learned-patterns.md`
+   - If the error matches a documented pattern → apply the fix from the registry.
+   - If it is a **new** recurring pattern → after fixing, **add it to the registry** (do not wait for user prompt). Include wrong/right examples, category, date. Then offer to add a **preventive rule** (e.g. in `_template/global-cursor-rules/` or company rules) so the agent does not make the same mistake again — this avoids token waste and repeated fatal errors.
+3. **Preventive rules**: When the fix was "don't do X" (e.g. don't use long inline scripts in PowerShell), create or update a rule that instructs the agent not to generate that pattern in the first place.
+
+This workspace participates in the cross-tool learned-patterns system; always prefer consulting the registry before guessing. **Adding patterns and preventive rules is self-improvement**: do it proactively so the same error is not repeated.

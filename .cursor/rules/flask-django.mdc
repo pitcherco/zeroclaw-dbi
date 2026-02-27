@@ -1,0 +1,19 @@
+---
+description: Flask and Django web framework patterns
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Web Frameworks
+
+## Flask (used in operations apps v1, v3)
+- Flask 3.x with SQLAlchemy ORM
+- Use application factory pattern
+- Blueprints for route organization
+- Flask-CORS for cross-origin requests
+
+## Django (used in operations app v2)
+- Django 4.x with Django REST Framework
+- Use class-based views
+- Celery + Redis for async tasks
+- Django ORM with PostgreSQL backend

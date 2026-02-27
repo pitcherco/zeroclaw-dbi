@@ -26,7 +26,15 @@
       "Bash(gh project list --owner Pitcherco)",
       "Bash(gh auth refresh -s read:project,project)",
       "Bash(gh repo view Pitcherco/dbi-zero-claw)",
-      "Bash(gh repo list Pitcherco --limit 20)"
+      "Bash(gh repo list Pitcherco --limit 20)",
+      "Bash(git -C \"d:/repos/dirtybird/zeroclaw-dbi\" log --oneline -20)",
+      "Bash(git -C \"d:/repos/dirtybird/zeroclaw-dbi\" log --oneline --all)",
+      "Bash(git -C \"d:/repos/dirtybird/zeroclaw-dbi\" show e19a2dc --stat)",
+      "Bash(gh issue list --label \"POC\" --state open --json number,title,url)",
+      "Bash(gh issue list --state open --json number,title,url)",
+      "Bash(ssh zeroclaw@vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com 'sudo systemctl stop zeroclaw 2>&1; cat /home/zeroclaw/.zeroclaw/config.toml')",
+      "Bash(scp d:/repos/dirtybird/zeroclaw-dbi/infra/config.toml.template zeroclaw@vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com:/tmp/config.toml.template)",
+      "Bash(ssh zeroclaw@vm-zeroclaw-sbx-eastus.eastus.cloudapp.azure.com ':*)"
     ]
   }
 }

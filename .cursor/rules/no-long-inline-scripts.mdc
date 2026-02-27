@@ -1,0 +1,28 @@
+---
+description: Never run long multi-line code as inline -c in PowerShell; use script files to avoid fatal errors and token waste
+alwaysApply: true
+---
+
+# No Long Inline Scripts in PowerShell
+
+**Do not** generate terminal commands that pass long multi-line code as an inline string to PowerShell. This causes fatal errors and wastes tokens.
+
+## What fails
+
+- `python -c "..."` with more than a single short line → **"ScriptBlock should only be specified as a value of the Command parameter"** or parser/length limits
+- `bash -c "..."`, `node -e "..."`, etc. with long content → same class of failure
+
+## Required behavior
+
+1. **Before** running any non-trivial code (Python, Node, bash, etc.):
+   - If the code is more than one short line → **write it to a script file** (e.g. `run_discovery.py`, `scripts/analyze.py`) and run: `python run_discovery.py` or `.\run_discovery.py`.
+2. **Never** paste long multi-line code into a single `-c` or `-e` argument in PowerShell.
+3. Inline is acceptable **only** for a single short expression (e.g. `python -c "print(1+1)"`).
+
+## Why
+
+- Long inline script blocks are fragile and hit PowerShell/OS limits.
+- They waste tokens and often fail; fixing by then creating a script is redundant.
+- Writing a script file first is the correct approach from the start.
+
+See also: `D:\repos\_rules\learned-patterns.md` — Pattern 2 (PowerShell long inline script blocks).

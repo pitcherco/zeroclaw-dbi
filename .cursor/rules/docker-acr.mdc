@@ -1,0 +1,33 @@
+---
+description: Docker and Azure Container Registry patterns
+globs:
+  - "**/Dockerfile"
+  - "**/docker-compose*"
+  - "**/*.bicep"
+alwaysApply: false
+---
+
+# Docker & Azure Container Registry
+
+## Build Pattern
+```powershell
+# Login to ACR first
+az acr login --name <registry-name>
+
+# Build and tag
+docker build -t <registry>.azurecr.io/<image>:<tag> .
+
+# Push
+docker push <registry>.azurecr.io/<image>:<tag>
+```
+
+## Docker Compose
+- Use docker-compose.yml for local development
+- Environment variables via .env file
+- Volume mounts for development hot-reload
+
+## Dockerfile Best Practices
+- Multi-stage builds for smaller images
+- Use specific Python version tags
+- Copy requirements.txt first for layer caching
+- Run as non-root user in production

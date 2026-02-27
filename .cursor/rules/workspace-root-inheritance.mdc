@@ -1,0 +1,25 @@
+---
+description: Workspace root must be company folder for rules and MCP; sub-repos inherit via script
+alwaysApply: true
+---
+
+# Cursor Workspace Root and Inheritance
+
+**This company folder** (`d:\repos\dirtybird`) must be the Cursor workspace root for `.cursor/rules/` and `.cursor/mcp.json` to load. Cursor does not inherit config from parent folders.
+
+## If you opened a sub-repo (e.g. a single project folder)
+
+Rules and MCP will **not** load unless that repo has its own `.cursor` copied from this folder.
+
+**To give all sub-repos the same config** for Cursor, Claude Code, Windsurf, VS Code Copilot, Kiro, Antigravity, run from this company folder:
+
+```powershell
+.\scripts\propagate-ai-config.ps1
+```
+(or `.\scripts\propagate-cursor-config.ps1` — same effect)
+
+This copies `.cursor\`, `.claude\`, `.windsurfrules`, `.github\copilot-instructions.md`, `AGENTS.md`, and `CLAUDE.md` into every direct subfolder. Re-run after changing company-level config.
+
+## Preferred way to work
+
+Open this company folder as the Cursor workspace (File > Open Folder > `d:\repos\dirtybird`). Then all repos under it share the same rules and MCP without copying.

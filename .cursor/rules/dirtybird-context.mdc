@@ -1,0 +1,24 @@
+---
+description: Dirtybird Industries - US ecommerce, PostgreSQL, Azure, company GitHub
+alwaysApply: true
+---
+
+# Dirtybird Industries - Company Context
+
+Dirtybird Industries is a US-based ecommerce company selling firearms and accessories.
+
+## Infrastructure
+- Database: PostgreSQL on Azure
+- Source control: GitHub (company account: rdominguesds, email: rdomingues@pitcherco.com)
+- Cloud: Microsoft Azure (tenant: 36e770ef-e6fd-4f9d-9ace-a949f98a0caa, subscription: PPU, ID: fbcc25e6-6d59-43ba-b7a2-7c606880a202)
+- Container registry: Azure Container Registry (ACR)
+- CI/CD: GitHub Actions
+- Language: English
+
+## Tech Stack
+- Python (Flask, Django, Azure Functions, pandas, Crawl4AI, Playwright)
+- Node.js (n8n workflow automation)
+- Docker with Azure Container Registry
+- WooCommerce REST API integrations
+- Web scraping (Crawl4AI, Playwright, Selenium, BeautifulSoup4)
+- AI agents (OpenAI, Azure OpenAI, Streamlit)

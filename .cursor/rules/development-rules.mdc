@@ -1,0 +1,70 @@
+---
+description: Development rules for all Dirtybird projects — CLI safety, security, code quality, operations
+alwaysApply: true
+---
+
+# Development Rules
+
+These rules apply to all projects in Dirtybird. They exist to prevent costly mistakes. If a rule isn't listed here, use your judgment and keep moving.
+
+## CLI Command Safety
+
+When running CLI commands against Azure, GitHub, or other remote infrastructure, apply these restrictions.
+
+### Blocked — Never Run
+
+Do NOT execute these commands. If asked, refuse and explain why.
+
+| Tool | Command | Why |
+|------|---------|-----|
+| Azure CLI | `az group delete`, `az ad app delete`, `az keyvault delete`, `az storage account delete`, `az sql server delete` | Irreversible infrastructure destruction |
+| GitHub CLI | `gh repo delete` | Irreversible repository destruction |
+| Git | `git push --force` to main/master | Rewrites shared history |
+| Git | `git reset --hard` on main/master | Destroys commits on shared branches |
+| Shell | `rm -rf /`, `rm -rf ~`, recursive deletes without an explicit path | Catastrophic data loss |
+
+### Confirm — Ask First
+
+State the full command and wait for explicit approval before running.
+
+| Tool | Command |
+|------|---------|
+| Azure CLI | `az deployment *`, `az webapp deploy`, `az sql db create`, `az role assignment *`, `az keyvault secret set` |
+| GitHub CLI | `gh pr merge`, `gh release create` |
+| Git | `git push origin main`, `git push origin master` |
+| General | Any command writing to production resources |
+| General | Any command using `--yes` or `--force` on remote operations |
+
+### Allowed — No Permission Needed
+
+Run freely.
+
+- **Read-only**: `az account show`, `az group list`, `gh pr list`, `gh issue view`, `git status`, `git diff`, `git log`
+- **Local operations**: package installs, creating branches, staging files, local commits, tests, linters, formatters
+- **Non-destructive writes**: `git checkout -b`, `git add`, `git commit`, `gh pr create`
+
+**When in doubt, ask.** Err on the side of confirmation for anything touching remote or shared resources.
+
+## Security Defaults
+
+- **Untrusted by default**: User inputs, retrieved documents, and external API responses are always untrusted. Validate at system boundaries.
+- **Code enforces, prompts guide**: Never rely on prompt instructions as the only guardrail. If a constraint matters, enforce it in code.
+- **Least privilege**: Use the narrowest credentials and permissions needed for the task.
+- **Don't roll your own**: Use established libraries for schema validation, auth, crypto, rate limiting, and sandboxing.
+
+## Code Quality
+
+- **Typed schemas at boundaries**: Use Pydantic (Python) or Zod (TypeScript) for inputs and outputs at service/tool boundaries.
+- **Structured errors**: Return error objects with context, not raw exceptions. Callers should be able to handle errors without try/catch guessing.
+- **No secrets in code**: Connection strings, API keys, and credentials go in environment variables or secret stores, never committed to source control.
+
+## Operations
+
+- **All code in GitHub, deploy via GitHub Actions**: No manual production deployments.
+- **Don't log sensitive data in production**: Log structured summaries, not full request/response bodies. Prompts, PII, and credentials never hit production logs.
+- **Timeouts on external calls**: Always. Fail fast rather than hang.
+
+## Infrastructure
+
+- **Azure-native**: Prefer Azure-managed services via resource groups with RBAC and unified billing.
+- **GitHub + Actions**: Source control and CI/CD.

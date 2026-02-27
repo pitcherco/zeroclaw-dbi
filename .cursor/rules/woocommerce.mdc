@@ -1,0 +1,19 @@
+---
+description: WooCommerce REST API and webhook processing patterns
+globs: "**/WooCommerce*/**"
+alwaysApply: false
+---
+
+# WooCommerce Integration
+
+## Webhook Processing
+- Azure Functions receive WooCommerce webhook payloads
+- Validate webhook signatures before processing
+- Store raw payloads for debugging
+- Process orders, products, and customer data
+
+## WooCommerce REST API
+- Use requests library with API key authentication
+- Base URL pattern: https://store-url/wp-json/wc/v3/
+- Handle pagination with per_page and page parameters
+- Rate limiting: respect WooCommerce API limits

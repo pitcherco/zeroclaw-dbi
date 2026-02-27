@@ -1,0 +1,40 @@
+---
+description: PostgreSQL SQL dialect - NOT Snowflake, NOT Spark SQL
+globs: "**/*.sql"
+alwaysApply: false
+---
+
+# PostgreSQL SQL Dialect
+
+Use PostgreSQL dialect exclusively. Do NOT use Snowflake, T-SQL, or Spark SQL syntax.
+
+## PostgreSQL-Specific Features
+- JSONB for semi-structured data (not JSON, not VARIANT)
+- LATERAL for row expansion
+- ON CONFLICT for upserts (INSERT ... ON CONFLICT DO UPDATE)
+- RETURNING clause for getting affected rows
+- `::type` or CAST(x AS type) for casting
+- COALESCE(), NULLIF() for null handling
+- CASE WHEN for conditionals (NOT IFF())
+- Window functions with subquery for filtering (no QUALIFY)
+
+## Do NOT Use
+- IFF() (Snowflake-only)
+- QUALIFY (Snowflake-only)
+- VARIANT (Snowflake-only)
+- LATERAL FLATTEN (Snowflake-only)
+- explode() (Spark SQL-only)
+- MERGE INTO (prefer ON CONFLICT for PostgreSQL)
+- TRY_CAST (Snowflake-only, not standard PostgreSQL)
+
+## Date/Time Functions
+- NOW(), CURRENT_TIMESTAMP, CURRENT_DATE
+- date_trunc('month', column), date_part('year', column)
+- column + INTERVAL '1 day'
+- AGE(timestamp1, timestamp2)
+- EXTRACT(EPOCH FROM interval)
+
+## String Functions
+- string_agg(), array_agg()
+- LEFT(), RIGHT(), SUBSTRING()
+- REGEXP_MATCHES(), REGEXP_REPLACE()

@@ -1,0 +1,29 @@
+---
+description: CRITICAL - Verify Dirtybird Azure subscription before az commands
+alwaysApply: true
+---
+
+# Azure Identity - Dirtybird
+
+## Before ANY Azure CLI command:
+```powershell
+az account show --query "{name:name, user:user.name}" -o table
+# MUST show: PPU / rdomingues@pitcherco.com
+```
+
+## If wrong subscription:
+```powershell
+az account set --subscription "fbcc25e6-6d59-43ba-b7a2-7c606880a202"
+```
+
+## Azure Details
+- Tenant ID: 36e770ef-e6fd-4f9d-9ace-a949f98a0caa
+- Subscription: PPU (fbcc25e6-6d59-43ba-b7a2-7c606880a202)
+- User: rdomingues@pitcherco.com
+- Domain: dirtybirdusa.com
+
+## ACR Login
+Before Docker push operations:
+```powershell
+az acr login --name <dirtybird-acr-name>
+```

@@ -1,0 +1,27 @@
+---
+description: CRITICAL - Verify Dirtybird company GitHub account before git operations
+alwaysApply: true
+---
+
+# Git Identity - Dirtybird (COMPANY ACCOUNT)
+
+Dirtybird uses a SEPARATE company GitHub account, not the personal one.
+
+## Before ANY git operation (commit, push, pull, clone):
+```powershell
+git config user.email
+# MUST show: rdomingues@pitcherco.com
+# If it shows a different email, the gitconfig conditional includes may not be working.
+```
+
+## Before ANY GitHub CLI operation:
+```powershell
+gh auth status
+# MUST show: rdominguesds
+# If wrong account: gh auth switch --user rdominguesds
+```
+
+## Expected Identity
+- Name: Renato Domingues
+- Email: rdomingues@pitcherco.com
+- GitHub username: rdominguesds
