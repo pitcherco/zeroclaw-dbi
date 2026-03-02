@@ -179,13 +179,15 @@ class EmailBridge:
     # --- Mail operations ---
 
     async def _get_unread_messages(self, session: aiohttp.ClientSession) -> list:
-        """Fetch unread messages from Zero's inbox."""
+        """Fetch unread messages from Zero's inbox with full context."""
         data = await self._graph_get(
             session,
             f"/users/{ZERO_USER_ID}/mailFolders/inbox/messages"
             f"?$filter=isRead eq false"
             f"&$top=10"
-            f"&$select=id,subject,from,body,receivedDateTime,conversationId,hasAttachments"
+            f"&$select=id,subject,from,toRecipients,ccRecipients,body,"
+            f"receivedDateTime,conversationId,hasAttachments,importance,"
+            f"isRead,internetMessageId,replyTo"
             f"&$orderby=receivedDateTime asc",
         )
         return data.get("value", [])
@@ -347,6 +349,18 @@ class EmailBridge:
             sender = msg.get("from", {}).get("emailAddress", {})
             sender_addr = sender.get("address", "unknown")
             sender_name = sender.get("name", sender_addr)
+            received = msg.get("receivedDateTime", "")
+            importance = msg.get("importance", "normal")
+            conversation_id = msg.get("conversationId", "")
+
+            to_list = [
+                r.get("emailAddress", {}).get("address", "")
+                for r in msg.get("toRecipients", [])
+            ]
+            cc_list = [
+                r.get("emailAddress", {}).get("address", "")
+                for r in msg.get("ccRecipients", [])
+            ]
 
             # Skip automated/system emails
             if sender_addr.endswith("@teams.mail.microsoft") or "noreply" in sender_addr:
@@ -378,21 +392,36 @@ class EmailBridge:
             image_paths, doc_paths = await self._fetch_attachments(session, msg_id)
             image_paths.extend(self._save_data_uri_images(data_uri_images, msg_id))
 
-            # Build attachment sections for the prompt
-            attachment_lines = []
+            # Build full email envelope for the agent
+            header_lines = [
+                f"[Inbound Email]",
+                f"From: {sender_name} <{sender_addr}>",
+                f"To: {', '.join(to_list)}" if to_list else None,
+                f"CC: {', '.join(cc_list)}" if cc_list else None,
+                f"Subject: {subject}",
+                f"Date: {received}" if received else None,
+                f"Importance: {importance}" if importance != "normal" else None,
+                f"Conversation-ID: {conversation_id}" if conversation_id else None,
+                f"Message-ID: {msg_id}",
+            ]
+            header = "\n".join(line for line in header_lines if line)
+
+            # Build attachment sections
+            attachment_section = ""
+            parts = []
             if image_paths:
-                attachment_lines.extend(f"[IMAGE:{p}]" for p in image_paths)
+                parts.extend(f"[IMAGE:{p}]" for p in image_paths)
                 log.info("Including %d image(s) in prompt", len(image_paths))
             if doc_paths:
-                attachment_lines.append("\nAttached files saved to disk (use pdf_read or file_read to access):")
+                parts.append("Attached files saved to disk (use pdf_read or file_read to access):")
                 for p in doc_paths:
-                    attachment_lines.append(f"  - {p}")
+                    parts.append(f"  - {p}")
                 log.info("Including %d document(s) in prompt", len(doc_paths))
+            if parts:
+                attachment_section = "\n\n" + "\n".join(parts)
 
-            # Forward to ZeroClaw gateway
-            prompt = f"[Email from {sender_name} <{sender_addr}>]\nSubject: {subject}\n\n{content}"
-            if attachment_lines:
-                prompt = f"{prompt}\n\n" + "\n".join(attachment_lines)
+            # Compose full prompt
+            prompt = f"{header}\n\n{content}{attachment_section}"
             response = await self._forward_to_gateway(session, prompt)
 
             # Reply to the email
