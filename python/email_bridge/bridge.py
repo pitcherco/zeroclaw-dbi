@@ -45,7 +45,24 @@ IMAGE_MIME_TYPES = frozenset({
     "image/png", "image/jpeg", "image/jpg",
     "image/webp", "image/gif", "image/bmp",
 })
-MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB
+SAVEABLE_MIME_TYPES = frozenset({
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/vnd.ms-powerpoint",
+    "text/csv",
+    "text/plain",
+    "application/json",
+    "application/xml",
+    "text/xml",
+    "application/zip",
+    "application/x-zip-compressed",
+    "message/rfc822",
+})
+MAX_ATTACHMENT_SIZE = 50 * 1024 * 1024  # 50 MB
 
 
 def extract_inline_data_images(html: str) -> list[str]:
@@ -173,12 +190,14 @@ class EmailBridge:
         )
         return data.get("value", [])
 
-    async def _fetch_image_attachments(
+    async def _fetch_attachments(
         self, session: aiohttp.ClientSession, message_id: str
-    ) -> list[str]:
-        """Fetch image attachments (both regular and inline) via Graph API.
+    ) -> tuple[list[str], list[str]]:
+        """Fetch attachments via Graph API and save to disk.
 
-        Returns local file paths suitable for ZeroClaw [IMAGE:] markers.
+        Returns (image_paths, document_paths).
+        Image paths are used for [IMAGE:] markers.
+        Document paths are referenced in the prompt text for tool access.
         """
         data = await self._graph_get(
             session,
@@ -189,25 +208,30 @@ class EmailBridge:
                  len(attachments), message_id[:12])
 
         if not attachments:
-            return []
+            return [], []
 
         ATTACHMENT_DIR.mkdir(parents=True, exist_ok=True)
-        saved = []
+        images = []
+        documents = []
 
         for att in attachments:
             mime = (att.get("contentType") or "").lower().split(";")[0].strip()
-            name = att.get("name", "image.bin")
-            is_inline = att.get("isInline", False)
+            name = att.get("name", "attachment.bin")
+            size = att.get("size", 0)
 
-            if mime not in IMAGE_MIME_TYPES:
-                log.debug("Skipping non-image attachment: %s (%s)", name, mime)
+            is_image = mime in IMAGE_MIME_TYPES
+            is_document = mime in SAVEABLE_MIME_TYPES
+
+            if not is_image and not is_document:
+                log.debug("Skipping unsupported attachment: %s (%s)", name, mime)
                 continue
-            if att.get("size", 0) > MAX_IMAGE_SIZE:
-                log.warning("Skipping oversized attachment %s (%d bytes)", name, att.get("size"))
+            if size > MAX_ATTACHMENT_SIZE:
+                log.warning("Skipping oversized attachment %s (%d bytes)", name, size)
                 continue
+
             raw_b64 = att.get("contentBytes")
             if not raw_b64:
-                log.warning("Attachment %s has no contentBytes (may need /$value fetch)", name)
+                log.warning("Attachment %s has no contentBytes", name)
                 continue
             try:
                 raw = base64.b64decode(raw_b64)
@@ -215,14 +239,18 @@ class EmailBridge:
                 log.warning("Failed to decode attachment %s", name)
                 continue
 
-            tag = "inline" if is_inline else "attached"
             safe_name = re.sub(r"[^\w.\-]", "_", name)
             file_path = ATTACHMENT_DIR / f"{message_id[:12]}_{safe_name}"
             file_path.write_bytes(raw)
-            saved.append(str(file_path))
-            log.info("Saved %s image: %s (%d bytes)", tag, file_path.name, len(raw))
 
-        return saved
+            if is_image:
+                images.append(str(file_path))
+                log.info("Saved image: %s (%d bytes)", file_path.name, len(raw))
+            else:
+                documents.append(str(file_path))
+                log.info("Saved document: %s (%d bytes, %s)", file_path.name, len(raw), mime)
+
+        return images, documents
 
     def _save_data_uri_images(self, data_uris: list[str], message_id: str) -> list[str]:
         """Save data:image URIs extracted from HTML body to disk.
@@ -346,21 +374,25 @@ class EmailBridge:
             # Mark as read immediately to prevent re-processing
             await self._mark_as_read(session, msg_id)
 
-            # Collect images from all sources:
-            # 1. Graph API attachments (regular + inline cid: images)
-            # 2. Data URI images embedded in HTML body
-            all_image_paths = await self._fetch_image_attachments(session, msg_id)
-            all_image_paths.extend(self._save_data_uri_images(data_uri_images, msg_id))
+            # Fetch all attachments (images + documents) from Graph API
+            image_paths, doc_paths = await self._fetch_attachments(session, msg_id)
+            image_paths.extend(self._save_data_uri_images(data_uri_images, msg_id))
 
-            image_markers = ""
-            if all_image_paths:
-                image_markers = "\n".join(f"[IMAGE:{p}]" for p in all_image_paths)
-                log.info("Including %d image(s) in prompt", len(all_image_paths))
+            # Build attachment sections for the prompt
+            attachment_lines = []
+            if image_paths:
+                attachment_lines.extend(f"[IMAGE:{p}]" for p in image_paths)
+                log.info("Including %d image(s) in prompt", len(image_paths))
+            if doc_paths:
+                attachment_lines.append("\nAttached files saved to disk (use pdf_read or file_read to access):")
+                for p in doc_paths:
+                    attachment_lines.append(f"  - {p}")
+                log.info("Including %d document(s) in prompt", len(doc_paths))
 
             # Forward to ZeroClaw gateway
             prompt = f"[Email from {sender_name} <{sender_addr}>]\nSubject: {subject}\n\n{content}"
-            if image_markers:
-                prompt = f"{prompt}\n\n{image_markers}"
+            if attachment_lines:
+                prompt = f"{prompt}\n\n" + "\n".join(attachment_lines)
             response = await self._forward_to_gateway(session, prompt)
 
             # Reply to the email
