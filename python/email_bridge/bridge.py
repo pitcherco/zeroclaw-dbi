@@ -182,8 +182,7 @@ class EmailBridge:
         """
         data = await self._graph_get(
             session,
-            f"/users/{ZERO_USER_ID}/messages/{message_id}/attachments"
-            f"?$select=id,name,contentType,size,contentBytes,isInline",
+            f"/users/{ZERO_USER_ID}/messages/{message_id}/attachments",
         )
         attachments = data.get("value", [])
         log.info("Attachment API returned %d item(s) for message %s",
